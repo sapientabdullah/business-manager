@@ -1,6 +1,38 @@
 import Link from "next/link";
+import { useState } from "react";
 
 export default function SignupPage() {
+  
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  async function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    try {
+      const response = await fetch("/api/auth/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSuccess(`User added: ${data.email}`);
+        setEmail("");
+        setName("");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.error || "An error occurred");
+      }
+    } catch (error) {
+      console.error("Failed to add user: ", error);
+      setError("An unexpected error occurred");
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
@@ -8,7 +40,7 @@ export default function SignupPage() {
           Sign Up
         </h2>
 
-        <form>
+        <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
