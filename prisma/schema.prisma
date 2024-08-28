@@ -18,4 +18,12 @@ model User {
   email     String   @unique
   name      String?
   createdAt DateTime @default(now())
+} 
+
+model Inventory {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  quantity  Int      @default(0)
+  price     Float    @default(0.0)
+  createdAt DateTime @default(now())
 }

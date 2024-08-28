@@ -1,8 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { useState } from "react";
 
 export default function SignupPage() {
-  
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -11,13 +12,14 @@ export default function SignupPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     try {
-      const response = await fetch("/api/auth/add", {
+      const response = await fetch("/api/users/add", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, name }),
       });
+
       if (response.ok) {
         const data = await response.json();
         setSuccess(`User added: ${data.email}`);
@@ -28,7 +30,7 @@ export default function SignupPage() {
         setError(errorData.error || "An error occurred");
       }
     } catch (error) {
-      console.error("Failed to add user: ", error);
+      console.error("Failed to add user:", error);
       setError("An unexpected error occurred");
     }
   }
@@ -44,14 +46,16 @@ export default function SignupPage() {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="username"
+              htmlFor="Name"
             >
-              Username
+              Name
             </label>
             <input
-              id="username"
+              id="name"
               type="text"
-              placeholder="Enter your username"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Enter your name"
               className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
           </div>
@@ -66,12 +70,15 @@ export default function SignupPage() {
             <input
               id="email"
               type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
               placeholder="Enter your email"
               className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
               htmlFor="password"
@@ -84,7 +91,7 @@ export default function SignupPage() {
               placeholder="Enter your password"
               className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
-          </div>
+          </div> */}
 
           <button
             type="submit"
@@ -93,6 +100,8 @@ export default function SignupPage() {
             Sign Up
           </button>
         </form>
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {success && <p className="text-green-500 text-center">{success}</p>}
         <p className="text-center text-gray-600 mt-6">
           Already have an account?{" "}
           <Link href="/signin" className="text-blue-500 hover:underline">
