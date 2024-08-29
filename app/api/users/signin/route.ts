@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "@/utils/auth";
+import { verifyPassword, generateToken } from "@/utils/auth";
 
 const prisma = new PrismaClient();
 
@@ -14,21 +14,23 @@ export async function POST(req: Request) {
       });
     }
 
-    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.findUnique({ where: { username } });
 
-    const newUser = await prisma.user.create({
-      data: {
-        username,
-        password: hashedPassword,
-      },
-    });
+    if (!user || !(await verifyPassword(password, user.password))) {
+      return new Response(
+        JSON.stringify({ error: "Invalid username or password" }),
+        { status: 401 }
+      );
+    }
 
-    return new Response(JSON.stringify({ username: newUser.username }), {
-      status: 201,
+    const token = generateToken(user.username);
+
+    return new Response(JSON.stringify({ token }), {
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Error creating user:", (error as Error).message);
+    console.error("Error signing in user:", (error as Error).message);
     return new Response(
       JSON.stringify({ error: (error as Error).message || "An error occurred" }),
       { status: 500 }
