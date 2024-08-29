@@ -14,6 +14,9 @@ export default function CreateEmployeePage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  const employmentTypes = ["Full-Time", "Part-Time", "Contract", "Intern"];
+  const statuses = ["Active", "On Leave", "Terminated", "Resigned"];
+
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
@@ -61,142 +64,166 @@ export default function CreateEmployeePage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+      <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
           Create Employee
         </h2>
 
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Name
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter name"
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white border border-gray-300">
+              <thead>
+                <tr>
+                  <th className="border-b px-4 py-2 text-left">Field</th>
+                  <th className="border-b px-4 py-2 text-left">Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="border-b px-4 py-2">Name</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter name"
+                      className="w-full px-3 py-2 border rounded-lg"
+                      required
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email"
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Email</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Enter email"
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Phone
-            </label>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Enter phone number"
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Phone</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="Enter phone number"
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Role
-            </label>
-            <input
-              type="text"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              placeholder="Enter role"
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Role</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="text"
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      placeholder="Enter role"
+                      className="w-full px-3 py-2 border rounded-lg"
+                      required
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Employment Type
-            </label>
-            <input
-              type="text"
-              value={employmentType}
-              onChange={(e) => setEmploymentType(e.target.value)}
-              placeholder="Enter employment type"
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Employment Type</td>
+                  <td className="border-b px-4 py-2">
+                    <select
+                      value={employmentType}
+                      onChange={(e) => setEmploymentType(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg"
+                      required
+                    >
+                      <option value="">Select employment type</option>
+                      {employmentTypes.map((type) => (
+                        <option key={type} value={type}>
+                          {type}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Salary
-            </label>
-            <input
-              type="number"
-              value={salary}
-              onChange={(e) => setSalary(e.target.value)}
-              placeholder="Enter salary"
-              className="w-full px-3 py-2 border rounded-lg"
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Salary</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="number"
+                      value={salary}
+                      onChange={(e) => setSalary(e.target.value)}
+                      placeholder="Enter salary"
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Status
-            </label>
-            <input
-              type="text"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              placeholder="Enter status"
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Status</td>
+                  <td className="border-b px-4 py-2">
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg"
+                      required
+                    >
+                      <option value="">Select status</option>
+                      {statuses.map((statusOption) => (
+                        <option key={statusOption} value={statusOption}>
+                          {statusOption}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Start Date
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
-              required
-            />
-          </div>
+                <tr>
+                  <td className="border-b px-4 py-2">Start Date</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => setStartDate(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg"
+                      required
+                    />
+                  </td>
+                </tr>
 
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
-            />
+                <tr>
+                  <td className="border-b px-4 py-2">End Date</td>
+                  <td className="border-b px-4 py-2">
+                    <input
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+            className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
           >
             Create Employee
           </button>
         </form>
 
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {success && <p className="text-green-500 text-center">{success}</p>}
+        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
+        {success && (
+          <p className="text-green-500 text-center mt-4">{success}</p>
+        )}
       </div>
     </div>
   );
