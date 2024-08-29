@@ -16,7 +16,12 @@ export async function GET(request: Request) {
             },
           },
           {
-            email: {
+            role: {
+              contains: searchTerm,
+            },
+          },
+          {
+            status: {
               contains: searchTerm,
             },
           },
