@@ -27,3 +27,16 @@ model Inventory {
   unitCost  Float    @default(0.0)
   createdAt DateTime @default(now())
 }
+
+model Employee {
+  id             String    @id @default(cuid())
+  name           String
+  email          String?   @unique
+  phone          String?   @unique
+  role           String
+  employmentType String
+  salary         Float?
+  status         String
+  startDate      DateTime
+  endDate        DateTime?
+}
