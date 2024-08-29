@@ -1,17 +1,30 @@
 import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const searchTerm = url.searchParams.get("searchTerm") || "";
+
   try {
-    const customers = await prisma.customer.findMany();
-    return new Response(JSON.stringify(customers), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
+    const customers = await prisma.customer.findMany({
+      where: {
+        OR: [
+          { firstName: { contains: searchTerm } },
+          { lastName: { contains: searchTerm } },
+          { email: { contains: searchTerm } },
+          { phone: { contains: searchTerm } },
+        ],
+      },
     });
+
+    return NextResponse.json(customers);
   } catch (error) {
-    return new Response(JSON.stringify({ error: "An error occurred" }), {
-      status: 500,
-    });
+    console.error("Failed to fetch customers:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch customers" },
+      { status: 500 }
+    );
   }
 }

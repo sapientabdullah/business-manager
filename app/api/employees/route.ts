@@ -10,21 +10,9 @@ export async function GET(request: Request) {
     const employees = await prisma.employee.findMany({
       where: {
         OR: [
-          {
-            name: {
-              contains: searchTerm,
-            },
-          },
-          {
-            role: {
-              contains: searchTerm,
-            },
-          },
-          {
-            status: {
-              contains: searchTerm,
-            },
-          },
+          { name: { contains: searchTerm } },
+          { role: { contains: searchTerm } },
+          { status: { contains: searchTerm } },
         ],
       },
     });
