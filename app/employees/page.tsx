@@ -1,230 +1,142 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import CreateEmployee from "@/components/CreateEmployee";
+import Modal from "@/components/Modal";
 
-export default function CreateEmployeePage() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [role, setRole] = useState("");
-  const [employmentType, setEmploymentType] = useState("");
-  const [salary, setSalary] = useState("");
-  const [status, setStatus] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+interface Employee {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  role: string;
+  employmentType: string;
+  salary?: number;
+  status: string;
+  startDate: string;
+  endDate?: string;
+}
+
+export default function EmployeesPage() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const employmentTypes = ["Full-Time", "Part-Time", "Contract", "Intern"];
-  const statuses = ["Active", "On Leave", "Terminated", "Resigned"];
-
-  async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-
-    try {
-      const response = await fetch("/api/employees/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          role,
-          employmentType,
-          salary: parseFloat(salary),
-          status,
-          startDate,
-          endDate,
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSuccess(`Employee created: ${data.name}`);
-        // Reset form
-        setName("");
-        setEmail("");
-        setPhone("");
-        setRole("");
-        setEmploymentType("");
-        setSalary("");
-        setStatus("");
-        setStartDate("");
-        setEndDate("");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "An error occurred");
+  useEffect(() => {
+    async function fetchEmployees() {
+      try {
+        const response = await fetch(
+          `/api/employees?searchTerm=${encodeURIComponent(searchTerm)}`
+        );
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data: Employee[] = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        setError("Failed to fetch employees");
       }
+    }
+
+    fetchEmployees();
+  }, [searchTerm]);
+
+  async function handleEmployeeCreated() {
+    setIsModalOpen(false);
+    // Refresh employee list
+    try {
+      const response = await fetch(
+        `/api/employees?searchTerm=${encodeURIComponent(searchTerm)}`
+      );
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data: Employee[] = await response.json();
+      setEmployees(data);
     } catch (error) {
-      console.error("Failed to create employee:", error);
-      setError("An unexpected error occurred");
+      setError("Failed to fetch employees");
     }
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-4xl bg-white p-8 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create Employee
-        </h2>
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 p-8">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Employee List</h2>
+      {error && <p className="text-red-500">{error}</p>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300">
-              <thead>
-                <tr>
-                  <th className="border-b px-4 py-2 text-left">Field</th>
-                  <th className="border-b px-4 py-2 text-left">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="border-b px-4 py-2">Name</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter name"
-                      className="w-full px-3 py-2 border rounded-lg"
-                      required
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Email</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter email"
-                      className="w-full px-3 py-2 border rounded-lg"
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Phone</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="text"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="Enter phone number"
-                      className="w-full px-3 py-2 border rounded-lg"
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Role</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="text"
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                      placeholder="Enter role"
-                      className="w-full px-3 py-2 border rounded-lg"
-                      required
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Employment Type</td>
-                  <td className="border-b px-4 py-2">
-                    <select
-                      value={employmentType}
-                      onChange={(e) => setEmploymentType(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg"
-                      required
-                    >
-                      <option value="">Select employment type</option>
-                      {employmentTypes.map((type) => (
-                        <option key={type} value={type}>
-                          {type}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Salary</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="number"
-                      value={salary}
-                      onChange={(e) => setSalary(e.target.value)}
-                      placeholder="Enter salary"
-                      className="w-full px-3 py-2 border rounded-lg"
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Status</td>
-                  <td className="border-b px-4 py-2">
-                    <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg"
-                      required
-                    >
-                      <option value="">Select status</option>
-                      {statuses.map((statusOption) => (
-                        <option key={statusOption} value={statusOption}>
-                          {statusOption}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">Start Date</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="date"
-                      value={startDate}
-                      onChange={(e) => setStartDate(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg"
-                      required
-                    />
-                  </td>
-                </tr>
-
-                <tr>
-                  <td className="border-b px-4 py-2">End Date</td>
-                  <td className="border-b px-4 py-2">
-                    <input
-                      type="date"
-                      value={endDate}
-                      onChange={(e) => setEndDate(e.target.value)}
-                      className="w-full px-3 py-2 border rounded-lg"
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <button
-            type="submit"
-            className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
-          >
-            Create Employee
-          </button>
-        </form>
-
-        {error && <p className="text-red-500 text-center mt-4">{error}</p>}
-        {success && (
-          <p className="text-green-500 text-center mt-4">{success}</p>
-        )}
+      <div className="mb-6 w-full max-w-md">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search employees..."
+          className="w-full px-3 py-2 border rounded-lg"
+        />
       </div>
+
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="mb-6 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+      >
+        Add Employee
+      </button>
+
+      <div className="overflow-x-auto w-full">
+        <table className="min-w-full bg-white border border-gray-300">
+          <thead>
+            <tr>
+              <th className="border-b px-4 py-2 text-left">Name</th>
+              <th className="border-b px-4 py-2 text-left">Email</th>
+              <th className="border-b px-4 py-2 text-left">Phone</th>
+              <th className="border-b px-4 py-2 text-left">Role</th>
+              <th className="border-b px-4 py-2 text-left">Employment Type</th>
+              <th className="border-b px-4 py-2 text-left">Salary</th>
+              <th className="border-b px-4 py-2 text-left">Status</th>
+              <th className="border-b px-4 py-2 text-left">Start Date</th>
+              <th className="border-b px-4 py-2 text-left">End Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {employees.map((employee) => (
+              <tr key={employee.id}>
+                <td className="border-b px-4 py-2">{employee.name}</td>
+                <td className="border-b px-4 py-2">
+                  {employee.email || "N/A"}
+                </td>
+                <td className="border-b px-4 py-2">
+                  {employee.phone || "N/A"}
+                </td>
+                <td className="border-b px-4 py-2">{employee.role}</td>
+                <td className="border-b px-4 py-2">
+                  {employee.employmentType}
+                </td>
+                <td className="border-b px-4 py-2">
+                  {employee.salary !== undefined
+                    ? `${employee.salary.toFixed(2)} PKR`
+                    : "N/A"}
+                </td>
+                <td className="border-b px-4 py-2">{employee.status}</td>
+                <td className="border-b px-4 py-2">
+                  {new Date(employee.startDate).toLocaleDateString()}
+                </td>
+                <td className="border-b px-4 py-2">
+                  {employee.endDate
+                    ? new Date(employee.endDate).toLocaleDateString()
+                    : "N/A"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {isModalOpen && (
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <CreateEmployee
+            onEmployeeCreated={handleEmployeeCreated}
+            onClose={() => setIsModalOpen(false)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }
