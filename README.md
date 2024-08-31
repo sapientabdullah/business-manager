@@ -36,7 +36,7 @@ Make sure you have the following installed:
 2. **Navigate to the Project Directory:**
 
    ```bash
-   cd your-repository
+   cd business-manager
    ```
 
 3. **Install Dependencies:**
